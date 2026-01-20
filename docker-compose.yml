@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=production
+    ports:
+      - "2304:3000"
+    environment:
+      - NODE_ENV=production
+      - API_PORT=3000
+      - API_KEY=${API_KEY}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - ELECTION_PUBLIC_KEY_BASE64=${ELECTION_PUBLIC_KEY_BASE64}
+    env_file:
+      - .env
+    restart: unless-stopped
