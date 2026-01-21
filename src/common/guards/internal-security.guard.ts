@@ -50,7 +50,6 @@ export class SecurityHeadersGuard implements CanActivate {
         this.logger.fatal('CONFIG ERROR: ELECTION_PUBLIC_KEY_BASE64 no definida en el entorno.');
         throw new UnauthorizedException('Error interno de configuración de seguridad.');
       }
-      console.log('Base64 Public Key from config:', base64Key);
       const publicKey = Buffer.from(base64Key, 'base64').toString('utf-8');
 
       await this.jwtService.verifyAsync(token, {

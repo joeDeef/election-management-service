@@ -1,12 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { ElectionRepository } from '../repository/election.repository';
-import { CreateElectionDto } from '../dto/create-election.dto';
-import { CreateCandidateDto } from '../dto/create-candidate.dto';
+import { CreateElectionDataDto } from '../dto/data-election.dto';
 
 @Injectable()
 export class ElectionManagementService {
-  constructor(private readonly repository: ElectionRepository) {}
+  constructor(private readonly repository: ElectionRepository) { }
 
+  async createElection(dto: CreateElectionDataDto) {
+    return await this.repository.createElectionWithCandidates(dto);
+  }
+
+  async getElectionsWithCandidatesToday() {
+    return await this.repository.findElectionsWithCandidatesToday();
+  }
+
+/*
   async create(createElectionDto: CreateElectionDto) {
     return await this.repository.createElection(createElectionDto);
   }
@@ -29,5 +37,5 @@ export class ElectionManagementService {
   async getCandidatesToday() {
     const today = new Date().toISOString().split('T')[0];
     return await this.repository.findCandidatesByElectionDate(today);
-  }
+  }*/
 }
