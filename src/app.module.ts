@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { SupabaseModule } from './providers/supabase/supabase.module';
+import { SupabaseModule } from './supabase/supabase.module';
 import supabaseConfig from './config/supabase.config';
-import { ElectionManagementModule } from './modules/election-managment/election-management.module';
+import { ElectionManagementModule } from './modules/election-management.module';
 
+/**
+ * Root application module
+ * Configures global modules and dependencies for election management
+ */
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -12,7 +16,6 @@ import { ElectionManagementModule } from './modules/election-managment/election-
     }),
     SupabaseModule,
     ElectionManagementModule,
-    
   ],
 })
 export class AppModule {}

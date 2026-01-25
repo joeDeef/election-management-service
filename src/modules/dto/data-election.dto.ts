@@ -1,6 +1,9 @@
 import { IsString, IsArray, ValidateNested, IsDateString, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 
+/**
+ * DTO for candidate information within an election
+ */
 class CandidateInsideDto {
   @IsString()
   @IsNotEmpty()
@@ -11,6 +14,9 @@ class CandidateInsideDto {
   political_group: string;
 }
 
+/**
+ * DTO for creating a complete election with candidates
+ */
 export class CreateElectionDataDto {
   @IsString()
   @IsNotEmpty()
