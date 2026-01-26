@@ -11,29 +11,48 @@ import { CreateElectionDataDto } from '../dto/data-election.dto';
 export class ElectionRepository {
   private readonly logger = new Logger(ElectionRepository.name);
 
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(private readonly supabase: SupabaseService) { }
 
   /**
    * Retrieves all elections ordered by creation date
    * @returns List of all elections
    */
-  async findAllElections(): Promise<Election[]> {
+  async findAllElections(): Promise<any[]> {
     try {
       const client = this.supabase.getClient();
+
+      // 🔗 Hacemos el join con la tabla 'candidates'
       const { data, error } = await client
         .from('elections')
-        .select('*')
+        .select(`
+        id,
+        name,
+        description,
+        election_date,
+        created_at,
+        candidates (
+          name,
+          political_group
+        )
+      `)
         .order('created_at', { ascending: false });
 
       if (error) {
-        this.logger.error(`Database error fetching elections: ${error.message}`);
-        throw new InternalServerErrorException(`Error consultando elecciones: ${error.message}`);
+        this.logger.error(`Database error: ${error.message}`);
+        throw new InternalServerErrorException(`Error: ${error.message}`);
       }
 
-      this.logger.log(`Retrieved ${data?.length || 0} elections from database`);
-      return data;
+      // 🧹 Mapeamos para que la propiedad se llame 'candidatos' en lugar de 'candidates'
+      // y devolvemos la estructura limpia
+      return data.map(election => ({
+        name: election.name,
+        description: election.description,
+        election_date: election.election_date,
+        created_at: election.created_at,
+        candidatos: election.candidates // Supabase devuelve un array aquí
+      }));
+
     } catch (error) {
-      if (error instanceof InternalServerErrorException) throw error;
       this.logger.error('Unexpected error fetching elections', error.stack);
       throw new InternalServerErrorException('Failed to fetch elections');
     }
@@ -46,10 +65,10 @@ export class ElectionRepository {
    */
   async createElectionWithCandidates(dto: CreateElectionDataDto) {
     const client = this.supabase.getClient();
-    
+
     try {
       this.logger.log(`Creating election: ${dto.nameElection} with ${dto.candidatos.length} candidates`);
-      
+
       // Create election first
       const { data: election, error: electionError } = await client
         .from('elections')
@@ -127,7 +146,7 @@ export class ElectionRepository {
         this.logger.error(`Database error fetching today's elections: ${error.message}`);
         throw new InternalServerErrorException(error.message);
       }
-      
+
       this.logger.log(`Found ${data?.length || 0} elections for today with candidates`);
       return data;
     } catch (error) {
